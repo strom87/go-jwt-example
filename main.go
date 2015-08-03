@@ -13,6 +13,7 @@ package main
 
 import (
 	"crypto/rsa"
+	"errors"
 	"fmt"
 	"github.com/codegangsta/negroni"
 	"github.com/dgrijalva/jwt-go"
@@ -54,7 +55,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, errors.New("Unexpected signing method: " + token.Header["alg"].(string))
 		}
 		return publicKey, nil
 	})
