@@ -26,9 +26,9 @@ Run the following command:
 ```sh
 $ curl localhost:1337/token
 ```
-A token is returned, copy this token and replace the INSERT_YOUR_TOKEN part and run the following command:
+A token is returned, copy this token and replace the INSERT_TOKEN part and run the following command:
 ```sh
-$ curl -H "Authorization: Bearer INSERT_YOUR_TOKEN" localhost:1337/api
+$ curl -H "Authorization: Bearer INSERT_TOKEN" localhost:1337/api
 ```
 Now you should have access to the api.
 
