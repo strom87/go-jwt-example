@@ -64,6 +64,7 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 		return
 	}
 
+	LogError(err)
 	w.Write([]byte("Not authenticated, route protected"))
 }
 
