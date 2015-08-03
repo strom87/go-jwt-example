@@ -59,13 +59,13 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 		return publicKey, nil
 	})
 
-	if err == nil && token.Valid {
-		next(w, r)
+	if err != nil || !token.Valid {
+		LogError(err)
+		fmt.Fprintln(w, "Not authenticated, route protected")
 		return
 	}
 
-	LogError(err)
-	fmt.Fprintln(w, "Not authenticated, route protected")
+	next(w, r)
 }
 
 // Api path is the standard route but it is protected so
