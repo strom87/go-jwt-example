@@ -68,9 +68,9 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	w.Write([]byte("Not authenticated, route protected"))
 }
 
-// Home path is the standard route but it is protected so
+// Api path is the standard route but it is protected so
 // it needs a correct token to access it
-func HomeHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func ApiHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Write([]byte("Congrats, you have access to the protected route"))
 }
 
@@ -105,8 +105,8 @@ func main() {
 	router.Handle("/token", negroni.New(negroni.HandlerFunc(TokenHandler)))
 
 	// Add the AuthMiddleware to the request so it first checks if
-	// the token is valid before giving access to the home route
-	router.Handle("/", negroni.New(negroni.HandlerFunc(AuthMiddleware), negroni.HandlerFunc(HomeHandler)))
+	// the token is valid before giving access to the api route
+	router.Handle("/api", negroni.New(negroni.HandlerFunc(AuthMiddleware), negroni.HandlerFunc(ApiHandler)))
 
 	n.UseHandler(router)
 	http.ListenAndServe(":1337", n)
