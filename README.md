@@ -1,2 +1,38 @@
 # go-jwt-example
-A simple example using go-jwt "json web tokens"
+
+A simple example on how to use the go-jwt library for json web tokens
+
+### Tutorial
+Drag down the project
+```sh
+$ go get github.com/strom87/go-jwt-example
+```
+Run the main.go file to start the server.
+```sh
+$ go run main.go
+```
+The site listens to port 1337.  
+There is two routes.
+* [localhost:1337/api](http://localhost:1337/api)
+* [localhost:1337/token](http://localhost:1337/token)
+
+The /api route is protected and needs a valid token to be accessed.  
+To test if it works or not, run the following curl commands in your terminal window:
+```sh
+$ curl localhost:1337/api
+```
+Now you see the message "Not authenticated, route protected", we need to get a token before we can access the route.  
+Run the following command:
+```sh
+$ curl localhost:1337/token
+```
+A token is returned, copy this token and replace the INSERT_YOUR_TOKEN part and run the following command:
+```sh
+$ curl -H "Authorization: Bearer INSERT_YOUR_TOKEN" localhost:1337/api
+```
+Now you should have access to the api.
+
+## Libraries used
+* [https://github.com/dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go)
+* [https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni)
+* [https://github.com/gorilla/mux](https://github.com/gorilla/mux)
