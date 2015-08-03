@@ -46,7 +46,7 @@ func TokenHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	tokenString, err := token.SignedString(privateKey)
 	LogError(err)
 
-	w.Write([]byte(tokenString))
+	fmt.Fprintln(w, tokenString)
 }
 
 // Middleware that is used to check that the token is correct
@@ -65,13 +65,13 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	}
 
 	LogError(err)
-	w.Write([]byte("Not authenticated, route protected"))
+	fmt.Fprintln(w, "Not authenticated, route protected")
 }
 
 // Api path is the standard route but it is protected so
 // it needs a correct token to access it
 func ApiHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
-	w.Write([]byte("Congrats, you have access to the protected route"))
+	fmt.Fprintln(w, "Congrats, you have access to the protected route")
 }
 
 // Reads the public and private key file that is used to sign the token
