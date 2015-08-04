@@ -1,6 +1,6 @@
-# go-jwt-example
+# Go jwt example
 
-A simple example on how to use the go-jwt library for json web tokens
+A simple example on how to use jwt (Json Web Tokens) with go 
 
 ### Tutorial
 Drag down the project
