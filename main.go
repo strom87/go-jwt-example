@@ -102,11 +102,11 @@ func main() {
 	Init()
 	m := middle.New()
 
-	http.HandleFunc("/token", m.Then(TokenHandler))
+	http.HandleFunc("/token", m.ThenFunc(TokenHandler))
 
 	// Add the AuthMiddleware to the request so it first checks if
 	// the token is valid before giving access to the api route
-	http.HandleFunc("/api", m.Before(AuthMiddleware).Then(APIHandler))
+	http.HandleFunc("/api", m.Before(AuthMiddleware).ThenFunc(APIHandler))
 
 	http.ListenAndServe(":1337", nil)
 }
