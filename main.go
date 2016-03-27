@@ -15,12 +15,12 @@ import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"github.com/codegangsta/negroni"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
+	"github.com/strom87/middle"
 )
 
 // The paths to the rsa key files
@@ -35,8 +35,8 @@ var (
 	privateKey *rsa.PrivateKey
 )
 
-// Creates the token using RS256 and adds the claims
-func TokenHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+// TokenHandler creates the token using RS256 and adds the claims
+func TokenHandler(w http.ResponseWriter, r *http.Request) {
 	token := jwt.New(jwt.SigningMethodRS256)
 
 	token.Claims["name"] = "user name example"
@@ -50,9 +50,9 @@ func TokenHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc)
 	fmt.Fprintln(w, tokenString)
 }
 
-// Middleware that is used to check that the token is correct
+// AuthMiddleware middleware that is used to check that the token is correct
 // before giving access to the protected routes
-func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func AuthMiddleware(w http.ResponseWriter, r *http.Request) bool {
 	token, err := jwt.ParseFromRequest(r, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("Unexpected signing method: " + token.Header["alg"].(string))
@@ -63,19 +63,19 @@ func AuthMiddleware(w http.ResponseWriter, r *http.Request, next http.HandlerFun
 	if err != nil || !token.Valid {
 		LogError(err)
 		fmt.Fprintln(w, "Not authenticated, route protected")
-		return
+		return false
 	}
 
-	next(w, r)
+	return true
 }
 
-// Api path is the standard route but it is protected so
+// APIHandler path is the standard route but it is protected so
 // it needs a correct token to access it
-func ApiHandler(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+func APIHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Congrats, you have access to the protected route")
 }
 
-// Reads the public and private key file that is used to sign the token
+// Init reads the public and private key file that is used to sign the token
 // and adds them to the privateKey and publicKey variable
 func Init() {
 	publicKeyBytes, err := ioutil.ReadFile(publicKeyFilePath)
@@ -91,7 +91,7 @@ func Init() {
 	LogError(err)
 }
 
-// Only used to make it easy to write errors to the terminal window
+// LogError only used to make it easy to write errors to the terminal window
 func LogError(err error) {
 	if err != nil {
 		fmt.Println(err.Error())
@@ -100,15 +100,13 @@ func LogError(err error) {
 
 func main() {
 	Init()
-	router := mux.NewRouter()
-	n := negroni.Classic()
+	m := middle.New()
 
-	router.Handle("/token", negroni.New(negroni.HandlerFunc(TokenHandler)))
+	http.HandleFunc("/token", m.Then(TokenHandler))
 
 	// Add the AuthMiddleware to the request so it first checks if
 	// the token is valid before giving access to the api route
-	router.Handle("/api", negroni.New(negroni.HandlerFunc(AuthMiddleware), negroni.HandlerFunc(ApiHandler)))
+	http.HandleFunc("/api", m.Before(AuthMiddleware).Then(APIHandler))
 
-	n.UseHandler(router)
-	http.ListenAndServe(":1337", n)
+	http.ListenAndServe(":1337", nil)
 }

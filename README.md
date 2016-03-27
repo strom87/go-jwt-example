@@ -33,6 +33,5 @@ $ curl -H "Authorization: Bearer INSERT_TOKEN" localhost:1337/api
 Now you should have access to the api.
 
 ## Libraries used
+* [https://github.com/strom87/middle] (https://github.com/strom87/middle)
 * [https://github.com/dgrijalva/jwt-go](https://github.com/dgrijalva/jwt-go)
-* [https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni)
-* [https://github.com/gorilla/mux](https://github.com/gorilla/mux)
